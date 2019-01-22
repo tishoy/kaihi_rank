@@ -127,28 +127,34 @@ function drawByData(data, i) {
   let x = startX;
   //绘制底框
   // context_drawImage(assets.box, 0, startY + i * preOffsetY, stageWidth, barHeight);
-  x += 10;
+  x = startX;
   //设置字体
   context.font = fontSize + "px Arial";
   //绘制序号
   context.fillText((i + 1 + startID) + "", x, startY + i * preOffsetY + textOffsetY, textMaxSize);
+
+  context.fillText(data.nickname + "", x + textMaxSize + intervalX, startY + i * preOffsetY + textOffsetY, textMaxSize);
   // x += indexWidth + intervalX;
   //绘制头像
   var imageObj = wx.createImage();
   imageObj.onload = function () {
-    context.drawImage(imageObj, x, startY + i * preOffsetY + (barHeight - imageObj.width) / 2);
+    context.drawImage(imageObj, startX + textMaxSize + intervalX + textMaxSize + intervalX, startY + i * preOffsetY + (barHeight - imageObj.width) / 2);
   };
 
   imageObj.src = data.avatarUrl;
-  x += avatarSize + intervalX;
+ 
 
   // context_drawUrlImage(data.avatarUrl, x, startY + i * preOffsetY + (barHeight - avatarSize) / 2);
   // x += avatarSize + intervalX;
   //绘制名称
-  context.fillText(data.nickname + "", x, startY + i * preOffsetY + textOffsetY, textMaxSize);
-  x += textMaxSize + intervalX;
+  
   //绘制分数
-  context.fillText(data.score + "", startX + x, startY + i * preOffsetY + textOffsetY, textMaxSize);
+  if (data.score === undefined) {
+    context.fillText(0 + "",  startX + textMaxSize + intervalX + textMaxSize + intervalX + avatarSize + intervalX, startY + i * preOffsetY + textOffsetY, textMaxSize);
+  } else {
+    context.fillText(data.score + "",  startX + textMaxSize + intervalX + textMaxSize + intervalX + avatarSize + intervalX, startY + i * preOffsetY + textOffsetY, textMaxSize);
+  }
+  
 }
 
 /**
@@ -349,16 +355,17 @@ wx.getUserInfo({
           if (a.KVDataList.length === 0) {
             return 1;
           }
-          b.KVDataList[0].value = b.KVDataList[0].value || 0;
-          a.KVDataList[0].value = a.KVDataList[0].value || 0;
-          return b.KVDataList[0].value - a.KVDataList[0].value;
+          var aValue = JSON.parse(a.KVDataList[0].value).wxgame.card_num || 0;
+          var bValue = JSON.parse(b.KVDataList[0].value).wxgame.card_num || 0;
+          return bValue - aValue;
         });
 
         console.log(data);
         //显示自己的数据
         for (var i = 0; i < data.length; i++) {
           if (data[i].KVDataList.length > 0) {
-            data[i].score = JSON.parse(data[i].KVDataList[0].value).wxgame.score;
+            console.log(JSON.parse(data[i].KVDataList[0].value));
+            data[i].score = JSON.parse(data[i].KVDataList[0].value).wxgame.card_num;
           } else {
             data[i].score = 0;
           }
